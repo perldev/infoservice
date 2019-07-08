@@ -65,13 +65,15 @@ class Command(BaseCommand):
             
 #         print response.text 
          rss = response.text
+         #print rss
          #rss = rss.encode('ascii', 'xmlcharrefreplace')
          tree = html.fromstring(rss)
+         #print rss
          print "get price"
-         price = tree.cssselect("div.price-seller span.price")[0]
+         price = tree.cssselect("#showHeadingPrice_mobile span.price")[0]
          price_1 = stringify_children(price)
          try:
-            price = tree.cssselect("div.price-seller span.inline-wrap")[0]
+            price = tree.cssselect("#showHeadingPrice_mobile span.size13")[0]
             price_2 = stringify_children(price)
             item_domria.price = price_1 +" "+ price_2
          except:
@@ -101,7 +103,9 @@ class Command(BaseCommand):
             continue
                    
          labels = tree.xpath("//dl[@class=\"unstyle\"]/dd")
+         print "lables :"
          print labels
+         print len(labels)
          #labels = tree.xpath("//dl[@class=\"unstyle\"]/dd/span[@class=\"label\"]/text()")
          #print labels
          #arguments = tree.xpath("//dl[@class=\"unstyle\"]/dd/span[@class=\"argument\"]/text()")
@@ -118,13 +122,15 @@ class Command(BaseCommand):
            for item in labels: 
              #print stringify_children(i)
              keystr  =''.join(item.itertext()).strip()
+            
              keystr = keystr.split(":")
             # key ="".join(item.xpath("//text()")).strip()
              #print key
              key = keystr[0]
- 
+             
              key = translit(key.strip(), 'ru', reversed=True)
              key = key.replace(":","")
+             print key
              res_dict[key] = keystr[1].strip()
          except:
              traceback.print_exc()
