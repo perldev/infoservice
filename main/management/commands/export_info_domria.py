@@ -105,8 +105,10 @@ class Command(BaseCommand):
              phone = seller_info["firstPhone"]
           except:
              traceback.print_exc()
-             phone = seller_info["items"][0]["firstPhone"]
              print seller_info
+             if not "firstPhone" in seller_info["items"][0]:
+                 continue
+             phone = seller_info["items"][0]["firstPhone"]
             
              
           #region #city #type #rooms? #stage #surface #ground surface #material #price #phone #date #mark #photo #source #text 

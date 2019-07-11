@@ -126,12 +126,20 @@ class Command(BaseCommand):
              keystr = keystr.split(":")
             # key ="".join(item.xpath("//text()")).strip()
              #print key
+             print keystr
              key = keystr[0]
+
+             if len(keystr)>1:
              
-             key = translit(key.strip(), 'ru', reversed=True)
-             key = key.replace(":","")
-             print key
-             res_dict[key] = keystr[1].strip()
+                key = translit(key.strip(), 'ru', reversed=True)
+                if "Opisanie" in key:
+                   continue 
+                key = key.replace(":","")
+                res_dict[key] = keystr[1].strip()
+             else:
+                key1 = translit(key.strip(), 'ru', reversed=True)
+                res_dict[key1] = key
+
          except:
              traceback.print_exc()
 
@@ -150,6 +158,7 @@ class Command(BaseCommand):
          item_domria.ext_info  = json.dumps(res_dict)
          item_domria.save()
          print "seems ok! continue"
+         print res_dict
          time.sleep(10)
        except:
          item_domria.counts = item_domria.counts + 1
