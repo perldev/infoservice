@@ -9,13 +9,14 @@ from lxml import html
 import unicodedata
 import sys
 from transliterate import translit, get_available_language_codes
+import os
 import json
 import time
 from selenium import webdriver
 from pyvirtualdisplay import Display
 from transliterate import translit, get_available_language_codes
 from itertools import chain
-
+import random
 #    url = models.CharField(verbose_name=u"URL from", max_length=255, unique=True)
 #    title = models.CharField(verbose_name=u"название ", max_length=255, )
 #    pub_date = models.DateTimeField(verbose_name=u"�~Tа�~Bа добавлени�~O",
@@ -49,6 +50,19 @@ headers = {"accept": "text/html,application/json,application/xhtml+xml,applicati
            "accept-encoding": "gzip, deflate, br",
            "accept-language": "uk-UA,uk;q=0.9,ru;q=0.8,en-US;q=0.7,en;q=0.6,de;q=0.5",
            "cache-control": "max-age=0", 'User-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/73.0.3683.75 Chrome/73.0.3683.75 Safari/537.36'}
+
+proxy_list = [
+"176.114.14.75",
+"217.147.169.95",
+"31.41.221.139",
+"93.190.43.94",
+"185.252.24.82",
+"91.234.34.170",
+"91.211.88.168",
+"185.230.88.23",
+"31.131.19.82"
+]
+
       
 
 
@@ -60,18 +74,28 @@ class Command(BaseCommand):
       chrome_options = webdriver.ChromeOptions()
       display = Display(visible=0, size=(1600, 900))
       display.start()
-      browser = webdriver.Chrome(chrome_options=chrome_options,  desired_capabilities={'loggingPrefs': {'profiler': 'INFO'}})
-      browser.maximize_window()
       chrome_options.add_argument('--headless')
       chrome_options.add_argument('--no-sandbox') # required when running as root user. otherwise you would get no sandbox errors. 
+      #chrome_options.add_argument('--start-maximized')
+      dc = webdriver.DesiredCapabilities.INTERNETEXPLORER.copy()
+# Change the proxy properties of that copy.
+      basep = random.choice(proxy_list)
+      PROXY = "http://%s:34512" % basep
+      PROXYS = "https://%s:34512" % basep
+      print "using proxy %s" % PROXY
+      os.environ["http_proxy"] = PROXY
+      os.environ["https_proxy"] = PROXYS
+      browser = webdriver.Chrome(chrome_options=chrome_options)
+      browser.maximize_window()
       browser.command_executor._commands.update({
     'getAvailableLogTypes': ('GET', '/session/$sessionId/log/types'),
     'getLog': ('POST', '/session/$sessionId/log')})
       yesterday = datetime.now() - dt(days=7)
       for item in olx.objects.filter(status="created", pub_date__gte=yesterday).order_by("-id"): 
         try:
-          #chrome_options.add_argument('window-size=1024x768')
+          chrome_options.add_argument('window-size=1024x768')
           browser.get(item.url)
+          #browser.get("https://2ip.ru")
           browser.implicitly_wait(random.choice((1,3,6,13,30)))
           browser.save_screenshot("../www/screenshot1_%i.png" % item.id)
           attrs = {}
