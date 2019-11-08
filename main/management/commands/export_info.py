@@ -18,7 +18,7 @@ import json
 import time
 from lxml.etree import tostring
 from itertools import chain
-
+from libs import user_agent_rotator, get_random_proxy
 
 from datetime import datetime
 import os
@@ -28,7 +28,7 @@ headers = {"accept": "text/html,application/json,application/xhtml+xml,applicati
                     "accept-encoding": "gzip, deflate, br",
                     "accept-language": "uk-UA,uk;q=0.9,ru;q=0.8,en-US;q=0.7,en;q=0.6,de;q=0.5",
                     "cache-control": "max-age=0", 'User-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/73.0.3683.75 Chrome/73.0.3683.75 Safari/537.36'}
-      
+
 
 class Command(BaseCommand):
     args = ''
@@ -106,7 +106,12 @@ class Command(BaseCommand):
           #repeat some additional info 
           response = None 
           try:
-           response = requests.get(item.url, headers=headers)
+           # Better masquerade here as well.
+           headers['User-agent'] = user_agent_rotator.get_random_user_agent()
+           baseproxy = get_random_proxy()
+           http_proxy = 'http://' + baseproxy
+           https_proxy = 'https://' + baseproxy
+           response = requests.get(item.url, headers=headers, proxies={'http_proxy':http_proxy,'https_proxy':https_proxy})
           except:
            # try later
            traceback.print_exc()
