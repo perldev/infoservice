@@ -7,7 +7,7 @@ import traceback
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "estate.settings")
 
-    LOCK =  "_".join(sys.argv[1:])
+    LOCK =  "_".join(sys.argv[1:2])
     print "time of working %s" % (datetime.now())
     lock = FileLock(LOCK)
     lock.acquire(timeout=3)    # wait up to 60 seconds
