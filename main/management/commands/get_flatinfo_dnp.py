@@ -41,12 +41,21 @@ https://dom.ria.com/ru/realty-perevireno-prodaja-kvartira-dnepropetrovsk-pobeda-
 """
 
 class Command(BaseCommand):
-    args = ''
-    help = 'fix user currency'
+    args = '<URL ...>'
+    help = 'gather phone'
 
     def handle(self, *args, **options):
-      for item_domria in domria.objects.filter(status='created'):
-       try:
+      q = domria.objects.filter(status='created')
+      try:
+         url = args[0] # "https://dom.ria.com/ru/realty-dolgosrochnaya-arenda-kvartira-dnepropetrovsk-novokodakskiy-petrovskogo-prospekt-15934787.html" # args[0]
+         print "parse this url %s" % url
+         q = domria.objects.filter(url = url)
+      except:
+         pass
+
+      for item_domria in q:
+
+        try:
          headers = {"accept": "text/html,application/json,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
                     "accept-encoding": "gzip, deflate, br",
                     "accept-language": "uk-UA,uk;q=0.9,ru;q=0.8,en-US;q=0.7,en;q=0.6,de;q=0.5",
@@ -111,12 +120,13 @@ class Command(BaseCommand):
          #arguments = tree.xpath("//dl[@class=\"unstyle\"]/dd/span[@class=\"argument\"]/text()")
          
          #print arguments
+         res_dict = {}
          try:
             description = tree.xpath("//p[@id=\"realtyDescriptionText\"]/text()")[0]
          except:
             description = ""
             traceback.print_exc()
-         res_dict = {}
+         res_dict["Opisanie"] = description
          try:
            print "getting params "
            for item in labels: 
@@ -160,7 +170,7 @@ class Command(BaseCommand):
          print "seems ok! continue"
          print res_dict
          time.sleep(10)
-       except:
+        except:
          item_domria.counts = item_domria.counts + 1
          if item_domria.counts>4:
              item_domria.status="canceled"
