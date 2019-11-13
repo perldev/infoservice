@@ -127,7 +127,7 @@ class Command(BaseCommand):
           worksheet.write(i, cols["phone"], phone )
           worksheet.write(i, cols["date"], str(item.pub_date) )
           worksheet.write(i, cols["source"], item.url )
-          worksheet.write(i, cols["text"], cleanhtml(ext_info.get("<span class=\"label\">Opisanie", "")) )
+          worksheet.write(i, cols["text"], cleanhtml(ext_info.get("Opisanie", "")) )
           i+=1
        
        workbook.close()
